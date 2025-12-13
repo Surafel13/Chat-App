@@ -1,0 +1,42 @@
+.UserBar{
+    position: fixed;
+    width: 250px;
+    left: 0;
+    top: 0;
+    height: 100%;
+    border: 1px black solid;
+}
+
+.barHeader{
+    display: flex;
+    justify-content: space-around;
+    padding-top: 40px;
+    height: 60px;
+
+    
+}
+
+.barHeader button{
+    height: 30px;
+    background-color: red;
+}
+
+.InputWrapper{
+    padding: 4px 0px;
+    text-align: center;
+    margin-top: 25px;
+}
+.InputWrapper input{
+    padding: 12px;
+    width: 210px;
+    border-radius: 12px;
+}
+
+.usersWrapper li{
+    margin: 15px 0px;
+    margin-left: 5px;
+}
+
+.blackbody{
+    background-color: black;
+}
