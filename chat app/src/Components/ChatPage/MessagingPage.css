@@ -10,12 +10,28 @@
 }
 
 .SenderMessage{
-    left: 0;
+    border: 1px black solid;
+    height: 40px;
+    border-radius: 15px;
+    padding: 5px ;
+    width: 250px;
+    background-color: #0D6EFD;
+    color: white;
+    margin-top: 9px;
+    margin-left: 3px;
+
 
 }
 .ReciverMessage{
     border: 1px black solid;
-    right: 0;
+    border-radius: 15px;
+    height: 40px;
+    padding: 5px ;
+    width: 250px;
+    background-color: blue;
+    color: white;
+    margin-left: 74px;
+
 }
 
 .bottomWrapper{
@@ -34,7 +50,7 @@
     padding: 10px 12px;
     margin: 4px 2px;
     margin-left: 15px;
-    /* border-radius: 27px; */
+    border-radius: 27px;
     height: 40px;
 
 }
