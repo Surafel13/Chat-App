@@ -1,13 +1,16 @@
 import React, { useState } from 'react'
+import { useNavigate } from "react-router-dom";
 import { FcGoogle } from "react-icons/fc";
 import { FaFacebook } from "react-icons/fa";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import './Auth.css'
+// import Verification from '../Verification/Verification';
 
 
 
 function Auth() {
 
+    const navigate = useNavigate();
 
     const [logIn, setLogIn] = useState(false)
     const [email, setEmail] = useState("")
@@ -25,15 +28,22 @@ function Auth() {
         if (name === "confirmPassword") setConfirmPassword(value);
     };
 
-    //     const CheckPassword = () => {
-    //   if (!confirmPassword) return null;
+        const CheckPassword = () => {
+      if (!confirmPassword) return null;
 
-    //   return password === confirmPassword ? null : (
-    //     <div className="warning">
-    //       <small>Check your password again!</small>
-    //     </div>
-    //   );
-    // };
+      return password === confirmPassword ? null : (
+        <div className="warning">
+          <small>Check your password again!</small>
+        </div>
+      );
+    };
+
+    const handleSubmit = (e) => {
+    e.preventDefault(); 
+   
+    navigate("/Verification"); 
+  };
+
 
 
 
@@ -64,14 +74,15 @@ function Auth() {
                                     </button>
                                 </div>
                                 <div>
-                                    <form onSubmit={(e) => e.preventDefault()}>
+                                    <form onSubmit={navigate(handleSubmit)}>
                                         <div className='inputWrapper'>
                                             <input
-                                                type="text"
+                                                type="email"
                                                 name="email"
                                                 placeholder="E-mail Address"
                                                 value={email}
                                                 onChange={handleChange}
+                                                required
                                             />
 
 
@@ -83,6 +94,7 @@ function Auth() {
                                                 placeholder="Password"
                                                 value={password}
                                                 onChange={handleChange}
+                                                required
                                             />
                                             <button
                                                 type="button"
@@ -93,7 +105,7 @@ function Auth() {
                                             </button>
                                         </div>
                                         <div>
-                                            <button className='LoginButton'>
+                                            <button className={`${password && email ? 'LoginButtonFocus' : 'LoginButton'}`} type='submit'>
                                                 Log In
                                             </button>
                                         </div>
@@ -134,14 +146,15 @@ function Auth() {
                                     </button>
                                 </div>
                                 <div>
-                                    <form action="">
+                                    <form onSubmit={handleSubmit}>
                                         <div className='inputWrapper'>
                                             <input
-                                                type="text"
+                                                type="email"
                                                 name="email"
                                                 placeholder="E-mail Address"
                                                 value={email}
                                                 onChange={handleChange}
+                                                required
                                             />
 
                                         </div>
@@ -152,6 +165,7 @@ function Auth() {
                                                 placeholder="Password"
                                                 value={password}
                                                 onChange={handleChange}
+                                                required
                                             />
                                             <button
                                                 type="button"
@@ -168,6 +182,7 @@ function Auth() {
                                                 placeholder="Confirm Password"
                                                 value={confirmPassword}
                                                 onChange={handleChange}
+                                                required
                                             />
                                             <button
                                                 type="button"
@@ -178,7 +193,7 @@ function Auth() {
                                             </button>
                                         </div>
                                         <div>
-                                            <button className='LoginButton'>
+                                            <button className={`${password && email && confirmPassword ? 'LoginButtonFocus' : 'LoginButton'}`} type='submit'>
                                                 Sign Up
                                             </button>
                                         </div>

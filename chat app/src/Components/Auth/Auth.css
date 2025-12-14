@@ -108,8 +108,14 @@
   color: white;
 }
 
-.LoginButtonFocus :hover{
+.LoginButtonFocus{
   background-color: hwb(216 1% 0%);
+  width: 240px;
+  height: 38px;
+  margin: 10px 0px;
+  border: none;
+  border-radius: 8px;
+  color: white;
 }
 
 
