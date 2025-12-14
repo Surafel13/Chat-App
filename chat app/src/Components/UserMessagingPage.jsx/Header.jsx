@@ -6,7 +6,7 @@ import MessagingPage from '../ChatPage/MessagingPage';
 
 
 function Header() {
-    const [isOpen, setIsOpen] = useState(false)
+    const [isOpen, setIsOpen] = useState(true)
     const [settingBar, setSettingBar] = useState(false)
 
 
