@@ -7,6 +7,7 @@ import img1 from './../../Img/cat-1.jpg'
 function Messaging() {
 
   const navigate = useNavigate()
+
   const [settingBar, setSettingBar] = useState(false)
 
   const toggleSettingBar = () => {
@@ -34,8 +35,8 @@ function Messaging() {
                 </div>
               </div>
 
-              <div className='SettingButton' onClick={toggleSettingBar}>
-                <button>
+              <div className='SettingButton'>
+                <button onClick={toggleSettingBar}>
                   ⋮
                 </button>
               </div>
@@ -45,6 +46,7 @@ function Messaging() {
               {
                 settingBar ?
                   <div className='settingBar'>
+                    <button onClick={navigate("/Profile")}>Look Profile</button>
                     <button>Clear History</button>
                     <button>Block User</button>
                     <button>Delete Chat</button>

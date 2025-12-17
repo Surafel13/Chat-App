@@ -15,7 +15,7 @@ function App() {
 
   return (
     <>
-      {/* {showSplash ? (
+      {showSplash ? (
         <SplashScreen onFinish={() => setShowSplash(false)} />
       ) : (
         <></>
@@ -25,9 +25,9 @@ function App() {
       <Route path="/verification" element={<Verification />} />
       <Route path="/Messaging" element={<Messaging />} />
       <Route path="/UsersBar" element={<UsersBar />} />
-    </Routes> */}
+      <Route path="/Profile" element={<Profile/>} />
+    </Routes>
 
-    <Profile/>
 
 
     
