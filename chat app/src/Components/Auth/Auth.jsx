@@ -5,9 +5,8 @@ import { FaFacebook } from "react-icons/fa";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { useUser } from "../../Context/UserContext";
 import "./Auth.css";
-
-// Firebase
 import { auth } from "../../../functions/Config/firebase.js";
+
 import {
     createUserWithEmailAndPassword,
     signInWithEmailAndPassword,
@@ -47,7 +46,7 @@ function Auth() {
         }
     };
 
-  
+
     const handleSubmit = async (e) => {
         e.preventDefault();
 

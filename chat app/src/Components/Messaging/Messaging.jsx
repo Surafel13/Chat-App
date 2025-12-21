@@ -9,27 +9,15 @@ function Messaging() {
 
   const navigate = useNavigate()
 
+  const { user } = useUser();
+  console.log(user)
+
   const [settingBar, setSettingBar] = useState(false)
 
   const toggleSettingBar = () => {
     setSettingBar(!settingBar)
   }
 
-  const { user } = useUser();
-  const [userName, setUserName] = React.useState('');
-
-  React.useEffect(() => {
-
-    if (user.displayName != null) {
-      setUserName(user.displayName);
-    }
-    else if (user.email != null) {
-      const nameFromEmail = user.email.split('@')[0];
-      setUserName(nameFromEmail);
-    }
-  }, [user]);
-
-  console.log(userName);
   return (
     <div className='MainWrapper container sm-h-75'>
       <div className='ChattingPage vh-100'>
@@ -46,7 +34,7 @@ function Messaging() {
                   <img src={img1} alt="img" />
                 </div>
                 <div className='NameContainer'>
-                  <h6>{userName}</h6>
+                  <h6>Name</h6>
                   <p>Status</p>
                 </div>
               </div>

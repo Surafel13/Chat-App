@@ -4,6 +4,7 @@ import { FaArrowLeft } from "react-icons/fa";
 import img1 from './../../Img/cat-1.jpg'
 import './Profile.css'
 import { useUser } from '../../Context/UserContext';
+import { getUsers } from '../../Users/Users';
 
 function Profile() {
 
@@ -21,6 +22,8 @@ function Profile() {
             setUserName(nameFromEmail);
         }
     }, [user]);
+
+    console.log(getUsers());
 
     return (
         <>
