@@ -51,16 +51,28 @@ function MessagingPage({ receiverId, currentUser }) {
             receiverId: receiverId,
             text: message,
             timestamp: serverTimestamp(),
-            // Adding user info for convenience (optional)
             senderName: currentUser.displayName || currentUser.email.split('@')[0]
         };
 
         try {
-            setMessage(""); // Clear input early for better UX
+            const currentMsg = message;
+            setMessage("");
+
+            // 1. Add the actual message
             await addDoc(collection(db, "messages"), messageData);
+
+            // 2. Update/Create the conversation summary for the sidebar
+            const { doc, setDoc } = await import("firebase/firestore");
+            await setDoc(doc(db, "conversations", chatId), {
+                chatId,
+                lastMessage: currentMsg,
+                lastSenderId: currentUser.uid,
+                participants: [currentUser.uid, receiverId],
+                timestamp: serverTimestamp()
+            }, { merge: true });
+
         } catch (error) {
             console.error("Error sending message:", error);
-            // Optionally handle error (e.g., show a toast)
         }
     }
 

@@ -1,5 +1,5 @@
 import { collection, getDocs } from "firebase/firestore";
-import { db } from "../../functions/Config/firebase";
+import { db } from "../firebase";
 
 export const getUsers = async () => {
     const usersCol = collection(db, 'users');

@@ -5,7 +5,7 @@ import { FaFacebook } from "react-icons/fa";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { useUser } from "../../Context/UserContext";
 import "./Auth.css";
-import { auth } from "../../../functions/Config/firebase.js";
+import { auth } from "../../firebase";
 
 import {
     createUserWithEmailAndPassword,
@@ -13,6 +13,8 @@ import {
     GoogleAuthProvider,
     signInWithPopup
 } from "firebase/auth";
+import { db } from "../../firebase";
+import { doc, setDoc } from "firebase/firestore";
 
 function Auth() {
     const navigate = useNavigate();
@@ -39,8 +41,19 @@ function Auth() {
 
         try {
             const result = await signInWithPopup(auth, provider);
-            setUser(result.user);
-            navigate("/Messaging");
+            const user = result.user;
+
+            // Save user to Firestore
+            await setDoc(doc(db, "users", user.uid), {
+                uid: user.uid,
+                email: user.email,
+                displayName: user.displayName,
+                photoURL: user.photoURL,
+                lastSeen: new Date()
+            }, { merge: true });
+
+            setUser(user);
+            navigate("/UsersBar");
         } catch (error) {
             alert(error.message);
         }
@@ -59,7 +72,17 @@ function Auth() {
 
             try {
                 const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-                setUser(userCredential.user);
+                const user = userCredential.user;
+
+                // Save user to Firestore
+                await setDoc(doc(db, "users", user.uid), {
+                    uid: user.uid,
+                    email: user.email,
+                    displayName: email.split('@')[0], // Default display name
+                    createdAt: new Date()
+                });
+
+                setUser(user);
                 navigate("/verification");
             } catch (err) {
                 alert(err.message);
@@ -69,7 +92,7 @@ function Auth() {
             try {
                 const userCredential = await signInWithEmailAndPassword(auth, email, password);
                 setUser(userCredential.user);
-                navigate("/Messaging");
+                navigate("/UsersBar");
             } catch (err) {
                 alert(err.message);
             }

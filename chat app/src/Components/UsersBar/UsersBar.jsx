@@ -3,41 +3,108 @@ import img1 from './../../Img/cat-1.jpg'
 import './UsersBar.css'
 import { useNavigate } from 'react-router-dom'
 import { getUsers } from '../../Users/Users'
-
+import { useUser } from '../../Context/UserContext'
+import { db } from '../../firebase'
+import { collection, query, where, onSnapshot } from 'firebase/firestore'
 
 function UsersBar() {
     const navigate = useNavigate()
+    const { user: currentUser } = useUser()
 
     const [users, setUsers] = React.useState([])
+    const [conversations, setConversations] = React.useState({})
     const [loading, setLoading] = React.useState(true)
     const [search, setSearch] = React.useState('')
 
+    // Safety check for auth
+    if (!currentUser && !loading) {
+        navigate('/');
+        return null;
+    }
+
+    // 1. Listen to all users in real-time
     React.useEffect(() => {
-        const fetchUsers = async () => {
-            try {
-                setLoading(true)
-                const usersList = await getUsers();
-                setUsers(usersList || []);
-            } catch (err) {
-                console.error('Failed to fetch users', err)
-                setUsers([])
-            } finally {
-                setLoading(false)
-            }
-        };
-        fetchUsers();
+        setLoading(true);
+        const q = query(collection(db, "users"));
+
+        const unsubscribe = onSnapshot(q, (snapshot) => {
+            const usersList = snapshot.docs.map(doc => ({
+                id: doc.id,
+                ...doc.data()
+            }));
+            setUsers(usersList);
+            setLoading(false);
+        }, (err) => {
+            console.error('Failed to fetch users', err);
+            setLoading(false);
+        });
+
+        return () => unsubscribe();
     }, []);
+
+    console.log(getUsers());
+
+    // 2. Listen to real-time conversation updates for last messages
+    React.useEffect(() => {
+        if (!currentUser) return;
+
+        const q = query(
+            collection(db, "conversations"),
+            where("participants", "array-contains", currentUser.uid)
+        );
+
+        const unsubscribe = onSnapshot(q, (snapshot) => {
+            const convMap = {};
+            snapshot.docs.forEach(doc => {
+                const data = doc.data();
+                // Find the other participant's ID
+                const otherId = data.participants.find(id => id !== currentUser.uid);
+                if (otherId) {
+                    convMap[otherId] = data;
+                }
+            });
+            setConversations(convMap);
+        });
+
+        return () => unsubscribe();
+    }, [currentUser]);
 
     const filteredUsers = React.useMemo(() => {
         const q = (search || '').trim().toLowerCase()
-        if (!q) return users
-        return users.filter((u) => {
+
+        let list = (users || [])
+            .filter(u => u && u.id !== currentUser?.uid) // Don't show yourself
+            .map(user => {
+                const conv = conversations[user.id];
+                let ts = 0;
+                if (conv?.timestamp) {
+                    if (typeof conv.timestamp.toMillis === 'function') {
+                        ts = conv.timestamp.toMillis();
+                    } else if (conv.timestamp instanceof Date) {
+                        ts = conv.timestamp.getTime();
+                    } else {
+                        ts = Number(conv.timestamp) || 0;
+                    }
+                }
+                return {
+                    ...user,
+                    lastMsg: conv?.lastMessage || "Start a new conversation",
+                    timestamp: ts
+                };
+            });
+
+        // Sort: users with recent history come first
+        list.sort((a, b) => b.timestamp - a.timestamp);
+
+        if (!q) return list;
+
+        return list.filter((u) => {
             const name = (u.displayName || '').toLowerCase()
             const email = (u.email || '').toLowerCase()
-            const local = email.split('@')[0]
+            const local = (u.email || '').split('@')[0]
             return name.includes(q) || email.includes(q) || local.includes(q)
-        })
-    }, [users, search])
+        });
+    }, [users, search, conversations])
 
 
 
@@ -45,7 +112,7 @@ function UsersBar() {
         <>
             <div className='MainWrapper container sm-h-75'>
 
-                <div className='UserBar'>
+                <div className='UsersContainer'>
                     <div className='barHeader'>
                         <h4>Messages</h4>
                     </div>
@@ -60,7 +127,7 @@ function UsersBar() {
                     </div>
                     <div><hr /></div>
                     <div className='text-center my-2 border-bottom border-top pt-2 pb-2'>
-                        <h5>Find freinds</h5>
+                        <h5>Find Friends</h5>
                     </div>
                     <div className='UsersList'>
                         {loading ? (
@@ -77,7 +144,7 @@ function UsersBar() {
                                     </div>
                                     <div className='UserInfo'>
                                         <h6>{user.displayName || (user.email && user.email.split('@')[0])}</h6>
-                                        <p>Last message...</p>
+                                        <p>{user.lastMsg}</p>
                                     </div>
                                 </div>
                             ))
