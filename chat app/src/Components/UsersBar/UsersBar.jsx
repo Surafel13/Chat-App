@@ -71,7 +71,7 @@ function UsersBar() {
                             <div className="emptyState">No users found</div>
                         ) : (
                             filteredUsers.map((user) => (
-                                <div key={user.id} className='UserItem' onClick={() => navigate('/Messaging')}>
+                                <div key={user.id} className='UserItem' onClick={() => navigate(`/Messaging/${user.id}`)}>
                                     <div className='imageWrapper'>
                                         <img src={img1} alt="img" />
                                     </div>

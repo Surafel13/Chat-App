@@ -10,3 +10,13 @@ export const getUsers = async () => {
     }));
     return userList;
 }
+
+export const getUser = async (uid) => {
+    const { doc, getDoc } = await import("firebase/firestore");
+    const docRef = doc(db, "users", uid);
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) {
+        return { id: docSnap.id, ...docSnap.data() };
+    }
+    return null;
+}

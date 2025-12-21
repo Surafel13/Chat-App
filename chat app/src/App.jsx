@@ -24,7 +24,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Auth />} />
         <Route path="/verification" element={<Verification />} />
-        <Route path="/Messaging" element={<Messaging />} />
+        <Route path="/Messaging/:receiverId" element={<Messaging />} />
         <Route path="/UsersBar" element={<UsersBar />} />
         <Route path="/Profile" element={<Profile />} />
       </Routes>

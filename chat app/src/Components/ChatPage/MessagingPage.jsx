@@ -1,70 +1,99 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import './MessagingPage.css'
+import { db } from '../../firebase'
+import { collection, addDoc, query, orderBy, onSnapshot, serverTimestamp, where } from 'firebase/firestore'
 
-function MessagingPage() {
-
-    const [focus, setFocus] = useState(false)
+function MessagingPage({ receiverId, currentUser }) {
     const [message, setMessage] = useState("")
-    const [messages, setMessages] = useState([
-        { id: 1, type: 'sender', text: 'Hey there! How are you doing today?', time: '10:50 PM' },
-        { id: 2, type: 'receiver', text: 'I am doing great! Thanks for asking. How about you?', time: '10:51 PM' },
-        { id: 3, type: 'sender', text: 'I am good too. Just working on this chat application.', time: '10:52 PM' },
-        { id: 4, type: 'receiver', text: 'That sounds interesting! Is it React based?', time: '10:53 PM' },
-        { id: 5, type: 'sender', text: 'Yes, it is built with React and pure CSS.', time: '10:54 PM' },
-        { id: 6, type: 'receiver', text: 'Awesome! I love the design so far.', time: '10:55 PM' },
-        { id: 7, type: 'sender', text: 'Thanks! I appreciate the feedback.', time: '10:56 PM' },
-        { id: 8, type: 'receiver', text: 'Keep up the good work!', time: '10:57 PM' },
-        { id: 9, type: 'sender', text: 'Will do! Talk to you later.', time: '10:58 PM' },
-        { id: 10, type: 'receiver', text: 'Bye!', time: '10:59 PM' },
-        { id: 11, type: 'sender', text: 'Check this scroll functionality.', time: '11:00 PM' },
-        { id: 12, type: 'receiver', text: 'It should work smoothly now.', time: '11:01 PM' }
-    ])
+    const [messages, setMessages] = useState([])
+    const messagesEndRef = useRef(null)
 
-    const handleChange = (e) => {
-        setMessage(e.target.value)
-    }
+    // Generate a unique chatId for the two users
+    const chatId = [currentUser.uid, receiverId].sort().join('_');
 
-    const handleFocus = () => {
-        setFocus(!focus)
-    }
+    useEffect(() => {
+        if (!chatId) return;
 
-    const messagesEndRef = React.useRef(null)
+        // Query messages for this specific chat, ordered by timestamp
+        const q = query(
+            collection(db, "messages"),
+            where("chatId", "==", chatId),
+            orderBy("timestamp", "asc")
+        );
+
+        const unsubscribe = onSnapshot(q, (snapshot) => {
+            const msgs = snapshot.docs.map(doc => ({
+                id: doc.id,
+                ...doc.data()
+            }));
+            setMessages(msgs);
+        }, (error) => {
+            console.error("Error listening to messages:", error);
+        });
+
+        return () => unsubscribe();
+    }, [chatId]);
+
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
     }
 
-    React.useEffect(() => {
+    useEffect(() => {
         scrollToBottom()
     }, [messages])
 
-    const handleSend = () => {
-        if (message.trim() === "") return;
-        const newMessage = {
-            id: messages.length + 1,
-            type: 'sender',
+    const handleSend = async () => {
+        if (message.trim() === "" || !currentUser) return;
+
+        const messageData = {
+            chatId: chatId,
+            senderId: currentUser.uid,
+            receiverId: receiverId,
             text: message,
-            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+            timestamp: serverTimestamp(),
+            // Adding user info for convenience (optional)
+            senderName: currentUser.displayName || currentUser.email.split('@')[0]
+        };
+
+        try {
+            setMessage(""); // Clear input early for better UX
+            await addDoc(collection(db, "messages"), messageData);
+        } catch (error) {
+            console.error("Error sending message:", error);
+            // Optionally handle error (e.g., show a toast)
         }
-        setMessages([...messages, newMessage])
-        setMessage("")
     }
 
     return (
         <div className='ChatSection'>
             <div className='MessagingArea'>
-                <div className='SenderMessage'>
-                    <p>
-                        Sender Messages
-                    </p>
-                    <small>10:50 PM</small>
-                </div>
+                {messages.length === 0 ? (
+                    <div className="text-center text-muted mt-5">
+                        <p>No messages yet. Say hi! 👋</p>
+                    </div>
+                ) : (
+                    messages.map((msg) => (
+                        <div
+                            key={msg.id}
+                            className={msg.senderId === currentUser.uid ? 'ReciverMessage' : 'SenderMessage'}
+                        >
+                            <p>{msg.text}</p>
+                            <small>
+                                {msg.timestamp?.toDate ?
+                                    msg.timestamp.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                                    : 'Sending...'}
+                            </small>
+                        </div>
+                    ))
+                )}
                 <div ref={messagesEndRef} />
             </div>
             <div className='bottomWrapper'>
                 <div>
-                    <input type="text"
+                    <input
+                        type="text"
                         placeholder='Write Something... '
-                        onChange={handleChange}
+                        onChange={(e) => setMessage(e.target.value)}
                         value={message}
                         onKeyDown={(e) => e.key === 'Enter' && handleSend()}
                     />
