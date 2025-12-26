@@ -40,7 +40,7 @@
     word-wrap: break-word;
 }
 
-/* Sender (Left - person you are chatting with) */
+/* Sender (Left - messages received from others) */
 .SenderMessage {
     align-self: flex-start;
     background-color: white;
@@ -50,7 +50,7 @@
     border: 1px solid #edf2f7;
 }
 
-/* Receiver (Right - the user themselves) */
+/* Receiver (Right - your sent messages) */
 .ReciverMessage {
     align-self: flex-end;
     background: #1488cc;

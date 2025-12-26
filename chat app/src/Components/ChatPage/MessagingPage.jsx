@@ -8,16 +8,16 @@ function MessagingPage({ receiverId, currentUser }) {
     const [messages, setMessages] = useState([])
     const messagesEndRef = useRef(null)
 
-    // Generate a unique chatId for the two users
-    const chatId = [currentUser.uid, receiverId].sort().join('_');
+    // Generate a unique conversationId for the two users
+    const conversationId = [currentUser.uid, receiverId].sort().join('_');
 
     useEffect(() => {
-        if (!chatId) return;
+        if (!conversationId) return;
 
-        // Query messages for this specific chat, ordered by timestamp
+        // Query messages for this specific conversation, ordered by timestamp
         const q = query(
             collection(db, "messages"),
-            where("chatId", "==", chatId),
+            where("conversationId", "==", conversationId),
             orderBy("timestamp", "asc")
         );
 
@@ -32,7 +32,7 @@ function MessagingPage({ receiverId, currentUser }) {
         });
 
         return () => unsubscribe();
-    }, [chatId]);
+    }, [conversationId]);
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
@@ -46,7 +46,7 @@ function MessagingPage({ receiverId, currentUser }) {
         if (message.trim() === "" || !currentUser) return;
 
         const messageData = {
-            chatId: chatId,
+            conversationId: conversationId,
             senderId: currentUser.uid,
             receiverId: receiverId,
             text: message,
@@ -63,8 +63,8 @@ function MessagingPage({ receiverId, currentUser }) {
 
             // 2. Update/Create the conversation summary for the sidebar
             const { doc, setDoc } = await import("firebase/firestore");
-            await setDoc(doc(db, "conversations", chatId), {
-                chatId,
+            await setDoc(doc(db, "conversations", conversationId), {
+                conversationId,
                 lastMessage: currentMsg,
                 lastSenderId: currentUser.uid,
                 participants: [currentUser.uid, receiverId],

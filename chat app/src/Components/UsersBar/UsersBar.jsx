@@ -60,10 +60,10 @@ function UsersBar() {
         return () => unsubscribe();
     }, [currentUser]);
 
-    const filteredUsers = React.useMemo(() => {
+    const { activeChats, findFriends } = React.useMemo(() => {
         const q = (search || '').trim().toLowerCase()
 
-        let list = (users || [])
+        let allList = (users || [])
             .filter(u => u && u.id !== currentUser?.uid)
             .map(user => {
                 const conv = conversations[user.id];
@@ -73,21 +73,28 @@ function UsersBar() {
                 }
                 return {
                     ...user,
-                    lastMsg: conv?.lastMessage || "Start a new conversation",
-                    timestamp: ts
+                    lastMsg: conv?.lastMessage,
+                    timestamp: ts,
+                    hasHistory: !!conv
                 };
             });
 
-        // Sort: users with recent history come first
-        list.sort((a, b) => b.timestamp - a.timestamp);
+        // Filter by search query if present
+        if (q) {
+            allList = allList.filter(u =>
+                (u.displayName || '').toLowerCase().includes(q) ||
+                (u.email || '').toLowerCase().includes(q)
+            );
+        }
 
-        if (!q) return list;
+        const active = allList
+            .filter(u => u.hasHistory)
+            .sort((a, b) => b.timestamp - a.timestamp);
 
-        return list.filter((u) => {
-            const name = (u.displayName || '').toLowerCase()
-            const email = (u.email || '').toLowerCase()
-            return name.includes(q) || email.includes(q)
-        });
+        const friends = allList
+            .filter(u => !u.hasHistory);
+
+        return { activeChats: active, findFriends: friends };
     }, [users, search, conversations, currentUser])
 
     return (
@@ -98,7 +105,7 @@ function UsersBar() {
             <div className='InputWrapper'>
                 <input
                     type="text"
-                    placeholder='Search students...'
+                    placeholder='Search...'
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
                 />
@@ -109,24 +116,56 @@ function UsersBar() {
                     <div className="spinnerWrap">
                         <div className="spinner"></div>
                     </div>
-                ) : filteredUsers.length === 0 ? (
-                    <div className="emptyState">No students found</div>
                 ) : (
-                    filteredUsers.map((user) => (
-                        <div
-                            key={user.id}
-                            className={`UserItem ${receiverId === user.id ? 'active' : ''}`}
-                            onClick={() => navigate(`/Messaging/${user.id}`)}
-                        >
-                            <div className='imageWrapper'>
-                                <img src={user.photoURL || img1} alt="img" />
+                    <>
+                        {/* 1. Conversations Section */}
+                        {activeChats.length > 0 && (
+                            <div className='SectionWrapper'>
+                                <p className='SectionTitle'>Recent Conversations</p>
+                                {activeChats.map((user) => (
+                                    <div
+                                        key={user.id}
+                                        className={`UserItem ${receiverId === user.id ? 'active' : ''}`}
+                                        onClick={() => navigate(`/Messaging/${user.id}`)}
+                                    >
+                                        <div className='imageWrapper'>
+                                            <img src={user.photoURL || img1} alt="img" />
+                                        </div>
+                                        <div className='UserInfo'>
+                                            <h6>{user.displayName || user.email.split('@')[0]}</h6>
+                                            <p>{user.lastMsg}</p>
+                                        </div>
+                                    </div>
+                                ))}
                             </div>
-                            <div className='UserInfo'>
-                                <h6>{user.displayName || user.email.split('@')[0]}</h6>
-                                <p>{user.lastMsg}</p>
+                        )}
+
+                        {/* 2. Find Friends Section */}
+                        {findFriends.length > 0 && (
+                            <div className='SectionWrapper'>
+                                <p className='SectionTitle'>Find Friend</p>
+                                {findFriends.map((user) => (
+                                    <div
+                                        key={user.id}
+                                        className={`UserItem ${receiverId === user.id ? 'active' : ''}`}
+                                        onClick={() => navigate(`/Messaging/${user.id}`)}
+                                    >
+                                        <div className='imageWrapper'>
+                                            <img src={user.photoURL || img1} alt="img" />
+                                        </div>
+                                        <div className='UserInfo'>
+                                            <h6>{user.displayName || user.email.split('@')[0]}</h6>
+                                            <p>Start a new chat</p>
+                                        </div>
+                                    </div>
+                                ))}
                             </div>
-                        </div>
-                    ))
+                        )}
+
+                        {activeChats.length === 0 && findFriends.length === 0 && (
+                            <div className="emptyState">No users found</div>
+                        )}
+                    </>
                 )}
             </div>
         </div>
