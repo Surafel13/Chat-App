@@ -67,7 +67,7 @@ function Messaging() {
               <div className='SettingWrapper'>
                 {settingBar && (
                   <div className='settingBar'>
-                    <button onClick={() => navigate("/Profile")}>Look Profile</button>
+                    <button onClick={() => navigate(`/Profile/${receiverId}`)}>Look Profile</button>
                     <button>Clear History</button>
                     <button>Block User</button>
                     <button>Delete Chat</button>

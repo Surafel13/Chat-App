@@ -1,52 +1,60 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { FaArrowLeft, FaCamera, FaSave, FaUserEdit, FaExpand } from "react-icons/fa";
 import './Profile.css';
 import { useUser } from '../../Context/UserContext';
 import { db } from '../../firebase';
-import { doc, updateDoc, onSnapshot } from 'firebase/firestore';
+import { doc, updateDoc, onSnapshot, getDoc } from 'firebase/firestore';
 import img1 from './../../Img/cat-1.jpg'; // Default image
 
 function Profile() {
     const navigate = useNavigate();
+    const { userId } = useParams(); // Optional ID from URL
     const { user: currentUser } = useUser();
+
+    // Determine whose profile we are viewing
+    // If no userId param, it's MY profile. If param exists, check if it matches me.
+    const isMyProfile = !userId || (currentUser && userId === currentUser.uid);
+    const targetUserId = userId || currentUser?.uid;
 
     // Form States
     const [displayName, setDisplayName] = useState('');
     const [status, setStatus] = useState('');
     const [photoURL, setPhotoURL] = useState('');
+    const [email, setEmail] = useState('');
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState({ type: '', text: '' });
     const [isEditing, setIsEditing] = useState(false);
 
-    // 1. Redirect if not logged in
+    // 1. Redirect if not logged in (basic protection)
     useEffect(() => {
         if (!currentUser) {
             navigate('/');
         }
     }, [currentUser, navigate]);
 
-    // 2. Listen to Real-time User Data
+    // 2. Listen to Real-time User Data for the TARGET user
     useEffect(() => {
-        if (!currentUser) return;
+        if (!targetUserId) return;
 
-        const userDocRef = doc(db, "users", currentUser.uid);
+        const userDocRef = doc(db, "users", targetUserId);
         const unsubscribe = onSnapshot(userDocRef, (docSnap) => {
             if (docSnap.exists()) {
                 const data = docSnap.data();
                 setDisplayName(data.displayName || '');
                 setStatus(data.status || 'Available');
                 setPhotoURL(data.photoURL || '');
+                setEmail(data.email || 'Hidden');
             }
         });
 
         return () => unsubscribe();
-    }, [currentUser]);
+    }, [targetUserId]);
 
-    // 3. Handle Update
+    // 3. Handle Update (Only allowed if isMyProfile)
     const handleUpdate = async (e) => {
         e.preventDefault();
-        if (!currentUser) return;
+        if (!isMyProfile || !currentUser) return;
 
         setLoading(true);
         setMessage({ type: '', text: '' });
@@ -56,7 +64,7 @@ function Profile() {
             await updateDoc(userRef, {
                 displayName: displayName,
                 status: status,
-                photoURL: photoURL // Assuming URL input for now, or just keeping existing
+                photoURL: photoURL
             });
 
             setMessage({ type: 'success', text: 'Profile updated successfully!' });
@@ -74,11 +82,21 @@ function Profile() {
 
     if (!currentUser) return null;
 
+    const handleBack = () => {
+        if (userId) {
+            // If viewing someone else, go back to chat with them
+            navigate(`/Messaging/${userId}`);
+        } else {
+            // If viewing my own setting, go to main list
+            navigate('/Messaging');
+        }
+    };
+
     return (
         <div className='ProfileContainer'>
             {/* Header / Cover Area */}
             <div className='UserInfoWrapper'>
-                <button className="back-btn" onClick={() => navigate('/Messaging')}>
+                <button className="back-btn" onClick={handleBack}>
                     <FaArrowLeft size={18} color="#4A5568" />
                 </button>
 
@@ -95,7 +113,7 @@ function Profile() {
                         <FaExpand size={14} />
                     </a>
 
-                    {isEditing && (
+                    {isEditing && isMyProfile && (
                         <div className="camera-icon">
                             <FaCamera />
                         </div>
@@ -111,8 +129,8 @@ function Profile() {
             {/* Form Section */}
             <div className='AccountInfoWrapper'>
                 <div className="section-header">
-                    <h5>Personal Information</h5>
-                    {!isEditing && (
+                    <h5>{isMyProfile ? "Personal Information" : "User Information"}</h5>
+                    {isMyProfile && !isEditing && (
                         <button className="edit-toggle-btn" onClick={() => setIsEditing(true)}>
                             <FaUserEdit /> Edit
                         </button>
@@ -129,13 +147,15 @@ function Profile() {
                     {/* Read Only Fields */}
                     <div className='Infos readonly'>
                         <small className="label">E-Mail Address</small>
-                        <p>{currentUser.email}</p>
+                        <p>{email}</p>
                     </div>
 
-                    <div className='Infos readonly'>
-                        <small className="label">User ID (Private)</small>
-                        <p>{currentUser.uid}</p>
-                    </div>
+                    {isMyProfile && (
+                        <div className='Infos readonly'>
+                            <small className="label">User ID (Private)</small>
+                            <p>{targetUserId}</p>
+                        </div>
+                    )}
 
                     {/* Editable Fields */}
                     <div className={`Infos ${isEditing ? 'editable' : ''}`}>
