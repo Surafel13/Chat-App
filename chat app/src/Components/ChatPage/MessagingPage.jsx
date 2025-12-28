@@ -14,11 +14,10 @@ function MessagingPage({ receiverId, currentUser }) {
     useEffect(() => {
         if (!conversationId) return;
 
-        // Query messages for this specific conversation, ordered by timestamp
+        // Query messages for this specific conversation (removed orderBy to avoid index issues)
         const q = query(
             collection(db, "messages"),
-            where("conversationId", "==", conversationId),
-            orderBy("timestamp", "asc")
+            where("conversationId", "==", conversationId)
         );
 
         const unsubscribe = onSnapshot(q, (snapshot) => {
@@ -26,6 +25,14 @@ function MessagingPage({ receiverId, currentUser }) {
                 id: doc.id,
                 ...doc.data()
             }));
+
+            // Client-side sort to ensure order without composite index
+            msgs.sort((a, b) => {
+                const tA = a.timestamp?.toMillis ? a.timestamp.toMillis() : (a.timestamp || 0);
+                const tB = b.timestamp?.toMillis ? b.timestamp.toMillis() : (b.timestamp || 0);
+                return tA - tB;
+            });
+
             setMessages(msgs);
         }, (error) => {
             console.error("Error listening to messages:", error);
@@ -87,7 +94,7 @@ function MessagingPage({ receiverId, currentUser }) {
                     messages.map((msg) => (
                         <div
                             key={msg.id}
-                            className={msg.senderId === currentUser.uid ? 'ReciverMessage' : 'SenderMessage'}
+                            className={msg.senderId === currentUser.uid ? 'MessageSelf' : 'MessageOthers'}
                         >
                             <p>{msg.text}</p>
                             <small>

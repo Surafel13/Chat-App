@@ -29,9 +29,9 @@
     border-radius: 3px;
 }
 
-/* Message Bubbles Common Styles */
-.SenderMessage,
-.ReciverMessage {
+/* Message Bubbles - Logical Naming */
+.MessageSelf,
+.MessageOthers {
     max-width: 75%;
     padding: 10px 16px;
     font-size: 0.95rem;
@@ -40,47 +40,50 @@
     word-wrap: break-word;
 }
 
-/* Sender (Left - messages received from others) */
-.SenderMessage {
-    align-self: flex-start;
-    background-color: white;
-    color: #2d3748;
-    border-radius: 4px 18px 18px 18px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-    border: 1px solid #edf2f7;
-}
-
-/* Receiver (Right - your sent messages) */
-.ReciverMessage {
+/* Me / The User (Right Side - Standard Chat App Behavior) */
+.MessageSelf {
     align-self: flex-end;
     background: #1488cc;
     color: white;
     border-radius: 18px 18px 4px 18px;
+    /* Tail bottom-right */
     box-shadow: 0 4px 12px rgba(20, 136, 204, 0.2);
 }
 
+/* Others / The Sender (Left Side - Standard Chat App Behavior) */
+.MessageOthers {
+    align-self: flex-start;
+    background: #ffffff;
+    color: #2d3748;
+    border-radius: 4px 18px 18px 18px;
+    /* Tail bottom-left */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    border: 1px solid #edf2f7;
+}
+
 /* Message Text */
-.SenderMessage p,
-.ReciverMessage p {
+.MessageSelf p,
+.MessageOthers p {
     margin: 0;
 }
 
 /* Timestamp */
-.SenderMessage small,
-.ReciverMessage small {
+.MessageSelf small,
+.MessageOthers small {
     display: block;
     font-size: 0.7rem;
     margin-top: 4px;
     opacity: 1;
 }
 
-.SenderMessage small {
-    color: #a0aec0;
-}
-
-.ReciverMessage small {
+.MessageSelf small {
     color: rgba(255, 255, 255, 0.8);
     text-align: right;
+}
+
+.MessageOthers small {
+    color: #a0aec0;
+    text-align: left;
 }
 
 /* Input Area (Bottom) */
