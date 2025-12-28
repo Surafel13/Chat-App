@@ -36,35 +36,61 @@
 /* User Image Section */
 .profile-image-section {
     position: relative;
-    width: 100%;
-    height: 280px;
+    width: 95%;
+    /* Mobile default */
+    max-width: 800px;
+    /* Desktop constraint */
+    height: 35vh;
+    min-height: 280px;
+    max-height: 400px;
     background: linear-gradient(120deg, #a1c4fd 0%, #c2e9fb 100%);
+    overflow: hidden;
+    margin: 20px auto 0;
+    /* Centered with top spacing */
+    border-radius: 30px;
+    /* Rounded card look */
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
 }
 
 .profile-image-section img {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    mask-image: linear-gradient(to bottom, black 50%, transparent 100%);
-    -webkit-mask-image: linear-gradient(to bottom, black 50%, transparent 100%);
-    opacity: 0.8;
+    object-position: top center;
+    /* Focus on the head/top of image */
+    /* Reduced mask intensity to show more image */
+    mask-image: linear-gradient(to bottom, black 80%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to bottom, black 80%, transparent 100%);
+    opacity: 1;
+    /* Fully visible */
+    transition: transform 0.3s ease;
 }
+
+/* Add a subtle zoom on hover for desktop */
+.profile-image-section:hover img {
+    transform: scale(1.02);
+}
+
 
 /* Avatar Overlay */
 .userInfo {
     text-align: center;
-    margin-top: -80px;
+    margin-top: -60px;
+    /* Less overlap */
     position: relative;
     z-index: 10;
-    padding-bottom: 2rem;
+    padding-bottom: 1rem;
+    pointer-events: none;
+    /* Let clicks pass through if needed, but text is selectable */
 }
 
 .userInfo h1 {
-    font-size: 2rem;
+    font-size: 2.2rem;
     font-weight: 800;
     color: #1a202c;
     margin: 1rem 0 0.5rem 0;
-    text-shadow: 0 2px 0 rgba(255, 255, 255, 0.5);
+    /* Clean text, removed shadow for better readability on white */
+    pointer-events: auto;
 }
 
 .userInfo small {
@@ -74,7 +100,8 @@
     border-radius: 20px;
     font-weight: 600;
     font-size: 0.9rem;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    pointer-events: auto;
 }
 
 /* Camera/Edit Icon */
@@ -89,6 +116,7 @@
     cursor: pointer;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     transition: transform 0.2s;
+    z-index: 60;
 }
 
 .camera-icon:hover {
@@ -102,11 +130,13 @@
     background: white;
     border-top-left-radius: 40px;
     border-top-right-radius: 40px;
-    padding: 2.5rem 2rem;
-    margin-top: -40px;
+    padding: 2rem 2.5rem;
+    /* Increased top padding */
+    margin-top: -10px;
+    /* Minimal overlap */
     position: relative;
     z-index: 20;
-    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.02);
     max-width: 800px;
     width: 100%;
     align-self: center;
@@ -285,14 +315,70 @@
     }
 }
 
+/* View Full Photo Button */
+.view-photo-btn {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    z-index: 50;
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(4px);
+    color: #2d3748;
+    border-radius: 50%;
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-decoration: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.view-photo-btn:hover {
+    background: white;
+    transform: scale(1.1);
+    color: #1488cc;
+}
+
 /* Responsive */
-@media (max-width: 600px) {
-    .AccountInfoWrapper {
-        border-radius: 30px 30px 0 0;
-        padding: 2rem 1.5rem;
+@media (max-width: 768px) {
+    .profile-image-section {
+        height: 30vh;
+        min-height: 200px;
     }
 
     .userInfo h1 {
-        font-size: 1.6rem;
+        font-size: 2rem;
+    }
+
+    .AccountInfoWrapper {
+        padding: 2rem 1.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .profile-image-section {
+        height: 25vh;
+        /* Smaller height on very small screens */
+    }
+
+    .userInfo {
+        margin-top: -60px;
+    }
+
+    .userInfo h1 {
+        font-size: 1.8rem;
+    }
+
+    .AccountInfoWrapper {
+        border-radius: 30px 30px 0 0;
+        padding: 1.5rem;
+    }
+
+    .form-actions {
+        grid-template-columns: 1fr;
+        /* Stack buttons on mobile */
     }
 }

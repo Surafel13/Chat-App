@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaArrowLeft, FaCamera, FaSave, FaUserEdit } from "react-icons/fa";
+import { FaArrowLeft, FaCamera, FaSave, FaUserEdit, FaExpand } from "react-icons/fa";
 import './Profile.css';
 import { useUser } from '../../Context/UserContext';
 import { db } from '../../firebase';
@@ -84,6 +84,17 @@ function Profile() {
 
                 <div className="profile-image-section">
                     <img src={photoURL || img1} alt="profile" />
+
+                    <a
+                        href={photoURL || img1}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="view-photo-btn"
+                        title="View Full Image"
+                    >
+                        <FaExpand size={14} />
+                    </a>
+
                     {isEditing && (
                         <div className="camera-icon">
                             <FaCamera />
