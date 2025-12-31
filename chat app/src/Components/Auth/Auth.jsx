@@ -49,12 +49,10 @@ function Auth() {
                 uid: user.uid,
                 email: user.email,
                 displayName: user.displayName,
-                photoURL: user.photoURL,
                 lastSeen: new Date(),
                 isVerified: true
             }, { merge: true });
 
-            setUser(user);
             navigate("/Messaging");
         } catch (error) {
             alert(error.message);
@@ -87,7 +85,6 @@ function Auth() {
 
                 await sendEmailVerification(user);
 
-                setUser(user);
                 navigate("/verification");
             } catch (err) {
                 alert(err.message);
@@ -95,8 +92,7 @@ function Auth() {
         } else {
             // LOGIN
             try {
-                const userCredential = await signInWithEmailAndPassword(auth, email, password);
-                setUser(userCredential.user);
+                await signInWithEmailAndPassword(auth, email, password);
                 navigate("/Messaging");
             } catch (err) {
                 alert(err.message);

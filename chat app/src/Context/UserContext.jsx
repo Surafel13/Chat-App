@@ -1,7 +1,7 @@
 import React, { createContext, useState, useContext, useEffect } from "react";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth, db } from "../firebase";
-import { doc, updateDoc, serverTimestamp } from "firebase/firestore";
+import { doc, updateDoc, serverTimestamp, onSnapshot } from "firebase/firestore";
 
 const UserContext = createContext();
 
@@ -23,14 +23,46 @@ export const UserProvider = ({ children }) => {
     };
 
     useEffect(() => {
-        const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-            if (currentUser) {
-                updateStatus(currentUser.uid, true);
-                setUser(currentUser);
+        let unsubscribeDoc = null;
+
+        const unsubscribeAuth = onAuthStateChanged(auth, async (authInstance) => {
+            if (authInstance) {
+                // Initialize user with ONLY auth fields we care about (EXCLUDE photoURL from provider)
+                const sanitizedAuthUser = {
+                    uid: authInstance.uid,
+                    email: authInstance.email,
+                    emailVerified: authInstance.emailVerified,
+                    displayName: authInstance.displayName // Fallback name
+                };
+
+                setUser(sanitizedAuthUser);
+                setLoading(false);
+
+                // Update online status
+                updateStatus(authInstance.uid, true);
+
+                // Listen to the Firestore document for real-time profile updates
+                if (unsubscribeDoc) unsubscribeDoc();
+
+                unsubscribeDoc = onSnapshot(doc(db, "users", authInstance.uid), (docSnap) => {
+                    if (docSnap.exists()) {
+                        const userData = docSnap.data();
+                        // Merge sanitized auth info with Firestore data
+                        setUser(prev => ({
+                            ...prev,
+                            ...userData,
+                            // Ensure these stay consistent
+                            uid: authInstance.uid,
+                            email: authInstance.email,
+                            emailVerified: authInstance.emailVerified
+                        }));
+                    }
+                });
             } else {
+                if (unsubscribeDoc) unsubscribeDoc();
                 setUser(null);
+                setLoading(false);
             }
-            setLoading(false);
         });
 
         const handleVisibilityChange = () => {
@@ -41,9 +73,6 @@ export const UserProvider = ({ children }) => {
 
         const handleUnload = () => {
             if (auth.currentUser) {
-                // Use a small trick for synchronous-like firestore update on close if possible
-                // though updateDoc is async. In modern browsers, we'd use navigator.sendBeacon
-                // but for Firestore we just try our best here.
                 updateStatus(auth.currentUser.uid, false);
             }
         };
@@ -54,7 +83,8 @@ export const UserProvider = ({ children }) => {
         return () => {
             window.removeEventListener('beforeunload', handleUnload);
             document.removeEventListener('visibilitychange', handleVisibilityChange);
-            unsubscribe();
+            unsubscribeAuth();
+            if (unsubscribeDoc) unsubscribeDoc();
         };
     }, []);
 

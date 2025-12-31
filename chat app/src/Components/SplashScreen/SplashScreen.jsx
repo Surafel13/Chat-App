@@ -9,6 +9,8 @@ function SplashScreen({ onFinish }) {
         autoPlay
         muted
         playsInline
+        disablePictureInPicture
+        disableRemotePlayback
         onEnded={onFinish}
         className="splash-video"
       >
