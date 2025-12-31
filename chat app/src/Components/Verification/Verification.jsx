@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import './Verification.css';
 import { useNavigate } from 'react-router-dom';
-import { auth } from '../../firebase'; // Adjust path if necessary
+import { auth, db } from '../../firebase'; // Adjust path if necessary
 import { sendEmailVerification, signOut } from 'firebase/auth';
+import { doc, updateDoc } from 'firebase/firestore';
 
 function Verification() {
     const navigate = useNavigate();
@@ -27,6 +28,10 @@ function Verification() {
                 if (auth.currentUser) {
                     await auth.currentUser.reload();
                     if (auth.currentUser.emailVerified) {
+                        // Update Firestore status
+                        const userRef = doc(db, "users", auth.currentUser.uid);
+                        await updateDoc(userRef, { isVerified: true });
+
                         clearInterval(interval);
                         navigate('/Messaging');
                     }

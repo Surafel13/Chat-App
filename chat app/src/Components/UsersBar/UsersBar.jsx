@@ -19,22 +19,34 @@ function UsersBar() {
 
     // 1. Listen to all users in real-time
     React.useEffect(() => {
+        let isMounted = true;
         setLoading(true);
+
         const q = query(collection(db, "users"));
 
         const unsubscribe = onSnapshot(q, (snapshot) => {
-            const usersList = snapshot.docs.map(doc => ({
-                id: doc.id,
-                ...doc.data()
-            }));
+            if (!isMounted) return;
+
+            // snapshot.docs only contains documents that currently exist in the database
+            const usersList = snapshot.docs
+                .map(doc => ({
+                    id: doc.id,
+                    ...doc.data()
+                }))
+                // Ensure we only keep users that have basic required data
+                .filter(u => u.email || u.displayName);
+
             setUsers(usersList);
             setLoading(false);
         }, (err) => {
             console.error('Failed to fetch users', err);
-            setLoading(false);
+            if (isMounted) setLoading(false);
         });
 
-        return () => unsubscribe();
+        return () => {
+            isMounted = false;
+            unsubscribe();
+        };
     }, []);
 
     // 2. Listen to real-time conversation updates for last messages
@@ -65,7 +77,7 @@ function UsersBar() {
         const q = (search || '').trim().toLowerCase()
 
         let allList = (users || [])
-            .filter(u => u && u.id !== currentUser?.uid)
+            .filter(u => u && u.id !== currentUser?.uid && u.isVerified !== false)
             .map(user => {
                 const conv = conversations[user.id];
                 let ts = 0;
@@ -155,7 +167,7 @@ function UsersBar() {
                                             {renderAvatar(user)}
                                         </div>
                                         <div className='UserInfo'>
-                                            <h6>{user.displayName || user.email.split('@')[0]}</h6>
+                                            <h6>{user.displayName || (user.email ? user.email.split('@')[0] : 'User')}</h6>
                                             <p>{user.lastMsg}</p>
                                         </div>
                                     </div>
@@ -177,7 +189,7 @@ function UsersBar() {
                                             {renderAvatar(user)}
                                         </div>
                                         <div className='UserInfo'>
-                                            <h6>{user.displayName || user.email.split('@')[0]}</h6>
+                                            <h6>{user.displayName || (user.email ? user.email.split('@')[0] : 'User')}</h6>
                                             <p>Start a new chat</p>
                                         </div>
                                     </div>

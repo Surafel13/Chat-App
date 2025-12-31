@@ -50,7 +50,8 @@ function Auth() {
                 email: user.email,
                 displayName: user.displayName,
                 photoURL: user.photoURL,
-                lastSeen: new Date()
+                lastSeen: new Date(),
+                isVerified: true
             }, { merge: true });
 
             setUser(user);
@@ -80,7 +81,8 @@ function Auth() {
                     uid: user.uid,
                     email: user.email,
                     displayName: email.split('@')[0], // Default display name
-                    createdAt: new Date()
+                    createdAt: new Date(),
+                    isVerified: false
                 });
 
                 await sendEmailVerification(user);
