@@ -11,7 +11,8 @@ import {
     createUserWithEmailAndPassword,
     signInWithEmailAndPassword,
     GoogleAuthProvider,
-    signInWithPopup
+    signInWithPopup,
+    sendEmailVerification
 } from "firebase/auth";
 import { db } from "../../firebase";
 import { doc, setDoc } from "firebase/firestore";
@@ -81,6 +82,8 @@ function Auth() {
                     displayName: email.split('@')[0], // Default display name
                     createdAt: new Date()
                 });
+
+                await sendEmailVerification(user);
 
                 setUser(user);
                 navigate("/verification");

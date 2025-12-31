@@ -31,9 +31,12 @@ function Profile() {
     const [isEditing, setIsEditing] = useState(false);
 
     // 1. Redirect if not logged in (basic protection)
+    // 1. Redirect if not logged in
     useEffect(() => {
         if (!currentUser) {
             navigate('/');
+        } else if (!currentUser.emailVerified) {
+            navigate('/verification');
         }
     }, [currentUser, navigate]);
 

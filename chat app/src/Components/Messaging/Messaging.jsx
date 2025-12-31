@@ -25,11 +25,18 @@ function Messaging() {
     }
   }, [receiverId]);
 
+  useEffect(() => {
+    if (currentUser && !currentUser.emailVerified) {
+      navigate('/verification');
+    }
+  }, [currentUser, navigate]);
+
   const toggleSettingBar = () => {
     setSettingBar(!settingBar)
   }
 
   if (!currentUser) return <div className='MainWrapper'>Loading authentication...</div>;
+  if (currentUser && !currentUser.emailVerified) return null;
 
   return (
     <div className='MainWrapper'>
