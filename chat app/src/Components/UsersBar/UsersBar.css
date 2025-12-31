@@ -1,7 +1,7 @@
 /* UsersBar component styles */
 .UsersContainer {
   width: 100%;
-  background: transparent;
+  background: #f8fafc;
   padding: 1.5rem 1rem;
   display: flex;
   flex-direction: column;
@@ -13,26 +13,27 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 12px;
+  padding: 14px;
   background: #fff;
-  border-radius: 16px;
-  margin-bottom: 1.5rem;
+  border-radius: 18px;
+  margin-bottom: 2rem;
   cursor: pointer;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-  transition: all 0.2s ease;
-  border: 1px solid #edf2f7;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid rgba(0, 0, 0, 0.03);
 }
 
 .CurrentUserHeader:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(20, 136, 204, 0.15);
+  transform: translateY(-3px);
+  box-shadow: 0 10px 25px rgba(20, 136, 204, 0.12);
   border-color: #bee3f8;
 }
 
 .settings-icon {
-  font-size: 1.2rem;
-  opacity: 0.5;
+  font-size: 1.25rem;
+  opacity: 0.4;
   transition: opacity 0.2s;
+  margin-left: auto;
 }
 
 .CurrentUserHeader:hover .settings-icon {
@@ -40,49 +41,50 @@
 }
 
 .barHeader {
-  padding-bottom: 0.5rem;
-  padding-left: 0.5rem;
+  padding: 0 0.5rem 1rem;
 }
 
 .barHeader h4 {
   margin: 0;
   font-weight: 800;
-  font-size: 1.2rem;
-  color: #a0aec0;
-  text-transform: uppercase;
-  letter-spacing: 1px;
+  font-size: 1.25rem;
+  color: #1e293b;
+  letter-spacing: -0.025em;
 }
 
 .InputWrapper {
-  margin: 1rem 0;
+  margin: 0 0 1.5rem 0;
   position: relative;
 }
 
 .InputWrapper input {
   width: 100%;
-  padding: 12px 16px;
-  padding-left: 40px;
-  border-radius: 12px;
+  padding: 14px 16px;
+  padding-left: 44px;
+  border-radius: 16px;
   border: 1px solid #e2e8f0;
   outline: none;
   background: #ffffff;
-  font-size: 0.9rem;
-  transition: all 0.2s;
+  font-size: 1rem;
+  transition: all 0.2s ease;
+  color: #1e293b;
 }
 
 .InputWrapper::before {
   content: "🔍";
   position: absolute;
-  left: 14px;
+  left: 16px;
   top: 50%;
   transform: translateY(-50%);
-  font-size: 0.9rem;
+  font-size: 1.1rem;
   opacity: 0.5;
+  pointer-events: none;
 }
 
 .InputWrapper input:focus {
   border-color: #1488cc;
-  box-shadow: 0 0 0 3px rgba(20, 136, 204, 0.1);
+  box-shadow: 0 0 0 4px rgba(20, 136, 204, 0.08);
+  background: #fff;
 }
 
 .UsersList {
@@ -90,74 +92,74 @@
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
   padding-right: 4px;
 }
 
 .UsersList::-webkit-scrollbar {
-  width: 4px;
+  width: 5px;
 }
 
 .UsersList::-webkit-scrollbar-thumb {
-  background: #cbd5e0;
+  background: #e2e8f0;
   border-radius: 10px;
 }
 
 .UserItem {
   display: flex;
-  gap: 12px;
+  gap: 14px;
   align-items: center;
-  padding: 10px;
-  border-radius: 14px;
-  transition: all 0.2s ease;
+  padding: 12px;
+  border-radius: 16px;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: pointer;
   border: 1px solid transparent;
+  background: transparent;
 }
 
 .UserItem:hover {
   background: #ffffff;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-  border-color: #edf2f7;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+  transform: translateX(4px);
 }
 
 .UserItem.active {
-  background: #ebf8ff;
+  background: #ffffff;
   border-color: #bee3f8;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
 }
 
 .imageWrapper {
-  width: 50px;
-  height: 50px;
-  min-width: 50px;
-  border-radius: 50%;
+  width: 54px;
+  height: 54px;
+  min-width: 54px;
+  border-radius: 18px;
   overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #f7fafc;
+  background: #f1f5f9;
+  position: relative;
 }
 
 .imageWrapper img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.3s ease;
-  border-radius: 50%;
-  /* Kept from original, not explicitly removed by instruction */
-  background: #edf2f7;
-  /* Kept from original, not explicitly removed by instruction */
+  border-radius: 18px;
 }
 
 .fallback-avatar-small {
   width: 100%;
   height: 100%;
-  border-radius: 50%;
+  border-radius: 18px;
   display: flex;
   align-items: center;
   justify-content: center;
   color: white;
-  font-weight: 700;
-  font-size: 1.2rem;
+  font-weight: 800;
+  font-size: 1.25rem;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .UserInfo {
@@ -167,43 +169,44 @@
 
 .UserInfo h6 {
   margin: 0;
-  font-size: 0.95rem;
+  font-size: 1rem;
   font-weight: 700;
-  color: #2d3748;
+  color: #1e293b;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  margin-bottom: 2px;
 }
 
 .UserInfo p {
   margin: 0;
-  color: #718096;
-  font-size: 0.8rem;
+  color: #64748b;
+  font-size: 0.85rem;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   font-weight: 500;
 }
 
-.emptyState {
-  padding: 2rem;
-  text-align: center;
-  color: #a0aec0;
-  font-style: italic;
-}
-
 .SectionWrapper {
-  margin-bottom: 1.5rem;
+  margin-bottom: 2.5rem;
 }
 
 .SectionTitle {
-  font-size: 0.75rem;
-  font-weight: 700;
+  font-size: 0.8rem;
+  font-weight: 800;
   text-transform: uppercase;
-  color: #a0aec0;
-  letter-spacing: 1px;
-  margin-bottom: 0.75rem;
+  color: #94a3b8;
+  letter-spacing: 0.1em;
+  margin-bottom: 1rem;
   padding-left: 0.5rem;
+}
+
+.emptyState {
+  padding: 3rem 1rem;
+  text-align: center;
+  color: #94a3b8;
+  font-weight: 500;
 }
 
 /* Spinner */
@@ -215,16 +218,30 @@
 }
 
 .spinner {
-  width: 28px;
-  height: 28px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
-  border: 3px solid #edf2f7;
+  border: 3px solid #e2e8f0;
   border-top-color: #1488cc;
-  animation: spin 0.8s linear infinite;
+  animation: spin 0.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
 }
 
 @keyframes spin {
   to {
     transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 768px) {
+  .UsersContainer {
+    padding: 1rem;
+  }
+
+  .UserItem:hover {
+    transform: none;
+  }
+
+  .CurrentUserHeader {
+    margin-bottom: 1.5rem;
   }
 }
