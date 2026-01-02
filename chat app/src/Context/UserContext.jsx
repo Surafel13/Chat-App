@@ -51,10 +51,11 @@ export const UserProvider = ({ children }) => {
                         setUser(prev => ({
                             ...prev,
                             ...userData,
-                            // Ensure these stay consistent
+                            // Priority to Auth for core fields, but allow Firestore to override/augment
                             uid: authInstance.uid,
                             email: authInstance.email,
-                            emailVerified: authInstance.emailVerified
+                            // Use status from Auth OR Firestore (in case Firestore is updated first)
+                            emailVerified: authInstance.emailVerified || userData.isVerified
                         }));
                     }
                 });

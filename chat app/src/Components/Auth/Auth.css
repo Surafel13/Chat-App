@@ -7,29 +7,30 @@
   width: 100%;
   padding: 24px;
   box-sizing: border-box;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: radial-gradient(circle at top right, #6366f1, #4f46e5, #3730a3);
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
 }
 
 .LoginContainer {
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-  border-radius: 24px;
-  padding: 3rem 2.5rem;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.3);
+  border-radius: 28px;
+  padding: 40px;
   width: 100%;
-  max-width: 420px;
+  max-width: 440px;
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
-  animation: authFadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  gap: 24px;
+  animation: authFadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 @keyframes authFadeIn {
   from {
     opacity: 0;
-    transform: translateY(30px) scale(0.95);
+    transform: translateY(40px) scale(0.95);
   }
 
   to {
@@ -39,15 +40,12 @@
 }
 
 .HeaderText h3 {
-  font-size: 2.25rem;
+  font-size: 32px;
   font-weight: 800;
-  margin: 0 0 1.5rem 0;
-  background: linear-gradient(135deg, #1e293b 0%, #475569 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
+  margin: 0 0 24px 0;
+  color: #1e293b;
   text-align: center;
-  letter-spacing: -0.025em;
+  letter-spacing: -0.03em;
 }
 
 .google-btn,
@@ -56,16 +54,16 @@
   align-items: center;
   justify-content: center;
   width: 100%;
-  padding: 0.85rem 1rem;
+  padding: 12px 16px;
   border-radius: 14px;
-  font-weight: 700;
-  font-size: 1rem;
+  font-weight: 600;
+  font-size: 15px;
   cursor: pointer;
   border: 1px solid #e2e8f0;
   background: white;
   color: #1e293b;
-  margin-bottom: 0.75rem;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  margin-bottom: 12px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .facebook-btn {
@@ -77,28 +75,55 @@
 .google-btn:hover {
   background-color: #f8fafc;
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  border-color: #cbd5e0;
 }
 
 .facebook-btn:hover {
   background: #166fe5;
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(24, 119, 242, 0.2);
+  box-shadow: 0 4px 12px rgba(24, 119, 242, 0.25);
+}
+
+/* Divider styling */
+.divider {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  margin: 16px 0;
+  color: #94a3b8;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.divider::before,
+.divider::after {
+  content: '';
+  flex: 1;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.divider:not(:empty)::before {
+  margin-right: 12px;
+}
+
+.divider:not(:empty)::after {
+  margin-left: 12px;
 }
 
 .inputWrapper {
   position: relative;
-  margin-bottom: 1.25rem;
+  margin-bottom: 16px;
   width: 100%;
 }
 
 .inputWrapper input {
   width: 100%;
-  padding: 1rem 1.25rem;
-  padding-right: 3rem;
+  padding: 14px 18px;
+  padding-right: 48px;
   border: 2px solid #f1f5f9;
   border-radius: 14px;
-  font-size: 1rem;
+  font-size: 15px;
   outline: none;
   transition: all 0.2s ease;
   box-sizing: border-box;
@@ -107,63 +132,50 @@
 }
 
 .inputWrapper input:focus {
-  border-color: #667eea;
+  border-color: #6366f1;
   background: white;
-  box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+  box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
 }
 
-.eyeBtn {
-  position: absolute;
-  right: 14px;
-  top: 50%;
-  transform: translateY(-50%);
-  background: none;
-  border: none;
-  cursor: pointer;
-  color: #94a3b8;
-  display: flex;
-  align-items: center;
-  padding: 6px;
-  font-size: 1.1rem;
-}
-
-.eyeBtn:hover {
-  color: #667eea;
+/* Remove default browser eye icons (Edge/IE) to prevent overlap with custom UI elements */
+input::-ms-reveal,
+input::-ms-clear {
+  display: none;
 }
 
 .LoginButtonFocus {
   width: 100%;
-  padding: 1rem;
+  padding: 14px;
   border: none;
   border-radius: 14px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
   color: white;
   font-weight: 700;
-  font-size: 1.1rem;
-  margin-top: 0.5rem;
+  font-size: 16px;
+  margin-top: 8px;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 10px 15px -3px rgba(102, 126, 234, 0.3);
+  box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.4);
 }
 
 .LoginButton {
   width: 100%;
-  padding: 1rem;
+  padding: 14px;
   border: none;
   border-radius: 14px;
   background: #e2e8f0;
   color: #94a3b8;
   font-weight: 700;
-  font-size: 1.1rem;
-  margin-top: 0.5rem;
+  font-size: 16px;
+  margin-top: 8px;
   cursor: not-allowed;
   transition: all 0.2s;
 }
 
 .LoginButtonFocus:hover {
   transform: translateY(-2px);
-  box-shadow: 0 20px 25px -5px rgba(102, 126, 234, 0.4);
-  opacity: 0.95;
+  box-shadow: 0 20px 25px -5px rgba(99, 102, 241, 0.5);
+  filter: brightness(1.1);
 }
 
 .LoginButtonFocus:active {
@@ -173,37 +185,54 @@
 small {
   display: block;
   text-align: center;
-  margin-top: 1.5rem;
+  margin-top: 24px;
   color: #64748b;
   font-weight: 500;
+  font-size: 14px;
+}
+
+small a {
+  color: #6366f1;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+small a:hover {
+  text-decoration: underline;
 }
 
 .LinkButton {
   background: none;
   border: none;
-  color: #667eea;
+  color: #6366f1;
   font-weight: 700;
   cursor: pointer;
-  padding: 0 4px;
+  padding: 0 6px;
+  font-size: 14px;
   transition: color 0.2s;
 }
 
 .LinkButton:hover {
-  color: #5a67d8;
+  color: #4f46e5;
   text-decoration: underline;
 }
 
 @media (max-width: 480px) {
   .LoginContainer {
-    padding: 2rem 1.5rem;
-    border-radius: 20px;
+    padding: 32px 24px;
+    border-radius: 24px;
+    gap: 20px;
   }
 
   .HeaderText h3 {
-    font-size: 1.8rem;
+    font-size: 26px;
   }
 
   .inputWrapper input {
-    padding: 0.85rem 1rem;
+    padding: 12px 16px;
+  }
+
+  .MainWrapper {
+    padding: 16px;
   }
 }

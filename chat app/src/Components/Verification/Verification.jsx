@@ -22,27 +22,31 @@ function Verification() {
             return;
         }
 
-        // Poll every 3 seconds to check if email is verified
+        // Poll every 5 seconds to check if email is verified
         const interval = setInterval(async () => {
-            try {
-                if (auth.currentUser) {
-                    await auth.currentUser.reload();
-                    if (auth.currentUser.emailVerified) {
-                        // Update Firestore status
-                        const userRef = doc(db, "users", auth.currentUser.uid);
-                        await updateDoc(userRef, { isVerified: true });
-
-                        clearInterval(interval);
-                        navigate('/Messaging');
-                    }
-                }
-            } catch (error) {
-                console.error("Error checking verification status", error);
-            }
-        }, 3000);
+            checkVerificationStatus();
+        }, 5000);
 
         return () => clearInterval(interval);
     }, [navigate]);
+
+    const checkVerificationStatus = async () => {
+        try {
+            if (auth.currentUser) {
+                await auth.currentUser.reload();
+                if (auth.currentUser.emailVerified) {
+                    // Update Firestore status
+                    const userRef = doc(db, "users", auth.currentUser.uid);
+                    await updateDoc(userRef, { isVerified: true });
+                    navigate('/Messaging');
+                    return true;
+                }
+            }
+        } catch (error) {
+            console.error("Error checking verification status", error);
+        }
+        return false;
+    };
 
     const handleResendEmail = async () => {
         setIsResending(true);
@@ -54,7 +58,6 @@ function Verification() {
             }
         } catch (error) {
             console.error("Error resending email:", error);
-            // Handle rate limiting usually thrown by Firebase
             if (error.code === 'auth/too-many-requests') {
                 setMessage('Too many requests. Please wait a bit before resending.');
             } else {
@@ -65,10 +68,20 @@ function Verification() {
         }
     };
 
+    const handleManualCheck = async () => {
+        const verified = await checkVerificationStatus();
+        if (!verified) {
+            setMessage('Email not yet verified. Please check your inbox.');
+            // Clear message after 3 seconds
+            setTimeout(() => setMessage(''), 3000);
+        }
+    };
+
     const handleLogout = async () => {
         try {
             if (auth.currentUser) {
-                await updateDoc(doc(db, "users", auth.currentUser.uid), {
+                const userRef = doc(db, "users", auth.currentUser.uid);
+                await updateDoc(userRef, {
                     isOnline: false,
                     lastSeen: new Date()
                 });
@@ -81,23 +94,38 @@ function Verification() {
     };
 
     return (
-        <div className='Main-container'>
-            <div className="verify-container">
+        <div className='VerificationPage'>
+            <div className="VerificationCard">
+                <div className="IconWrapper">
+                    <div className="MailIcon">📩</div>
+                </div>
                 <h2>Verify Your Email</h2>
-                <div className="verify-content">
+                <div className="VerificationContent">
                     <p>
-                        📩 We’ve sent a verification link to <strong>{auth.currentUser?.email}</strong>.
+                        We’ve sent a verification link to <br />
+                        <strong>{auth.currentUser?.email}</strong>
                     </p>
-                    <p>
-                        Please check your inbox (and spam folder) and click the link to verify your account.
-                        The system will automatically detect when you verify.
+                    <p className="description">
+                        Please check your inbox and click the link to verify your account.
+                        If you don't see it, check your <strong>spam folder</strong>.
                     </p>
 
-                    {message && <p className={`status-message ${message.includes('success') ? 'success' : 'error'}`}>{message}</p>}
+                    {message && (
+                        <div className={`status-message ${message.includes('success') ? 'success' : 'error'}`}>
+                            {message}
+                        </div>
+                    )}
 
                     <div className="button-group">
                         <button
-                            className="primary-btn"
+                            className="check-btn"
+                            onClick={handleManualCheck}
+                        >
+                            I've Verified My Email
+                        </button>
+
+                        <button
+                            className="resend-btn"
                             onClick={handleResendEmail}
                             disabled={isResending}
                         >
@@ -105,7 +133,7 @@ function Verification() {
                         </button>
 
                         <button
-                            className="secondary-btn"
+                            className="logout-btn"
                             onClick={handleLogout}
                         >
                             Log Out

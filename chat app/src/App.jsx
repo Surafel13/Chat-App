@@ -8,33 +8,27 @@ import SplashScreen from './Components/SplashScreen/SplashScreen'
 import Auth from './Components/Auth/Auth'
 import Verification from './Components/Verification/Verification'
 import Profile from './Components/Profile/Profile';
-
-
+import ProtectedRoute from './Components/Auth/ProtectedRoute';
 
 function App() {
   const [showSplash, setShowSplash] = useState(true);
 
   return (
     <>
-      {showSplash ? (
-        <SplashScreen onFinish={() => setShowSplash(false)} />
-      ) : (
-        <></>
-      )}
+      {showSplash && <SplashScreen onFinish={() => setShowSplash(false)} />}
       <Routes>
         <Route path="/" element={<Auth />} />
         <Route path="/verification" element={<Verification />} />
-        <Route path="/Messaging" element={<Messaging />} />
-        <Route path="/Messaging/:receiverId" element={<Messaging />} />
-        <Route path="/Profile" element={<Profile />} />
-        <Route path="/Profile/:userId" element={<Profile />} />
-        <Route path="/UsersBar" element={<Messaging />} />
+
+        {/* Protected Routes - require email verification */}
+        <Route element={<ProtectedRoute requiresVerification={true} />}>
+          <Route path="/Messaging" element={<Messaging />} />
+          <Route path="/Messaging/:receiverId" element={<Messaging />} />
+          <Route path="/Profile" element={<Profile />} />
+          <Route path="/Profile/:userId" element={<Profile />} />
+          <Route path="/UsersBar" element={<UsersBar />} />
+        </Route>
       </Routes>
-
-
-
-
-
     </>
   )
 }

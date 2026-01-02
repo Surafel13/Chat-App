@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FcGoogle } from "react-icons/fc";
 import { FaFacebook } from "react-icons/fa";
-import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { useUser } from "../../Context/UserContext";
 import "./Auth.css";
 import { auth } from "../../firebase";
@@ -24,8 +23,6 @@ function Auth() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
-    const [showPassword, setShowPassword] = useState(false);
-    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const { user, setUser } = useUser();
 
     const handleChange = (e) => {
@@ -44,17 +41,19 @@ function Auth() {
             const result = await signInWithPopup(auth, provider);
             const user = result.user;
 
-            // Save user to Firestore
+            // Save user to Firestore (merged to not overwrite existing data)
             await setDoc(doc(db, "users", user.uid), {
                 uid: user.uid,
                 email: user.email,
-                displayName: user.displayName,
+                displayName: user.displayName || user.email.split('@')[0],
                 lastSeen: new Date(),
-                isVerified: true
+                isVerified: true,
+                photoURL: user.photoURL || null
             }, { merge: true });
 
             navigate("/Messaging");
         } catch (error) {
+            console.error("Google Auth Error:", error);
             alert(error.message);
         }
     };
@@ -74,6 +73,9 @@ function Auth() {
                 const userCredential = await createUserWithEmailAndPassword(auth, email, password);
                 const user = userCredential.user;
 
+                // Send verification email
+                await sendEmailVerification(user);
+
                 // Save user to Firestore
                 await setDoc(doc(db, "users", user.uid), {
                     uid: user.uid,
@@ -83,18 +85,24 @@ function Auth() {
                     isVerified: false
                 });
 
-                await sendEmailVerification(user);
-
                 navigate("/verification");
             } catch (err) {
+                console.error("Signup Error:", err);
                 alert(err.message);
             }
         } else {
             // LOGIN
             try {
-                await signInWithEmailAndPassword(auth, email, password);
-                navigate("/Messaging");
+                const userCredential = await signInWithEmailAndPassword(auth, email, password);
+                const user = userCredential.user;
+
+                if (user.emailVerified) {
+                    navigate("/Messaging");
+                } else {
+                    navigate("/verification");
+                }
             } catch (err) {
+                console.error("Login Error:", err);
                 alert(err.message);
             }
         }
@@ -120,6 +128,8 @@ function Auth() {
                                 Continue with Facebook
                             </button>
 
+                            <div className="divider">OR</div>
+
                             <form onSubmit={handleSubmit}>
                                 <div className="inputWrapper">
                                     <input
@@ -134,20 +144,13 @@ function Auth() {
 
                                 <div className="inputWrapper">
                                     <input
-                                        type={showPassword ? "text" : "password"}
+                                        type="password"
                                         name="password"
                                         placeholder="Password"
                                         value={password}
                                         onChange={handleChange}
                                         required
                                     />
-                                    <button
-                                        type="button"
-                                        className="eyeBtn"
-                                        onClick={() => setShowPassword(!showPassword)}
-                                    >
-                                        {showPassword ? <FaEyeSlash /> : <FaEye />}
-                                    </button>
                                 </div>
 
                                 <button
@@ -190,6 +193,8 @@ function Auth() {
                                 Continue with Facebook
                             </button>
 
+                            <div className="divider">OR</div>
+
                             <form onSubmit={handleSubmit}>
                                 <div className="inputWrapper">
                                     <input
@@ -204,38 +209,24 @@ function Auth() {
 
                                 <div className="inputWrapper">
                                     <input
-                                        type={showPassword ? "text" : "password"}
+                                        type="password"
                                         name="password"
                                         placeholder="Password"
                                         value={password}
                                         onChange={handleChange}
                                         required
                                     />
-                                    <button
-                                        type="button"
-                                        className="eyeBtn"
-                                        onClick={() => setShowPassword(!showPassword)}
-                                    >
-                                        {showPassword ? <FaEyeSlash /> : <FaEye />}
-                                    </button>
                                 </div>
 
                                 <div className="inputWrapper">
                                     <input
-                                        type={showConfirmPassword ? "text" : "password"}
+                                        type="password"
                                         name="confirmPassword"
                                         placeholder="Confirm Password"
                                         value={confirmPassword}
                                         onChange={handleChange}
                                         required
                                     />
-                                    <button
-                                        type="button"
-                                        className="eyeBtn"
-                                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                                    >
-                                        {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
-                                    </button>
                                 </div>
 
                                 <button
